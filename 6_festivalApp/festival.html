@@ -1,0 +1,3414 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Festival Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            colors: {
+              primary: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                200: "#b9e6fe",
+                300: "#7cd4fd",
+                400: "#36c0fb",
+                500: "#0ca5eb",
+                600: "#0284c7",
+                700: "#0369a1",
+                800: "#075985",
+                900: "#0c4a6e",
+              },
+              secondary: {
+                50: "#fdf4ff",
+                100: "#fae8ff",
+                200: "#f5d0fe",
+                300: "#f0abfc",
+                400: "#e879f9",
+                500: "#d946ef",
+                600: "#c026d3",
+                700: "#a21caf",
+                800: "#86198f",
+                900: "#701a75",
+              },
+              dark: {
+                50: "#f8fafc",
+                100: "#f1f5f9",
+                200: "#e2e8f0",
+                300: "#cbd5e1",
+                400: "#94a3b8",
+                500: "#64748b",
+                600: "#475569",
+                700: "#334155",
+                800: "#1e293b",
+                900: "#0f172a",
+                950: "#020617",
+              },
+            },
+          },
+        },
+      };
+
+      // Check user's theme preference on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get saved theme preference from localStorage
+        const savedTheme = localStorage.getItem("theme");
+
+        // Apply theme based on saved preference or system preference
+        if (savedTheme === "dark") {
+          document.documentElement.classList.add("dark");
+          document.documentElement.classList.remove("light");
+        } else if (savedTheme === "light") {
+          document.documentElement.classList.add("light");
+          document.documentElement.classList.remove("dark");
+        } else {
+          // If no preference is saved, check system preference
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+          ) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.classList.remove("light");
+            localStorage.setItem("theme", "dark");
+          } else {
+            document.documentElement.classList.add("light");
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+          }
+        }
+      });
+    </script>
+    <style>
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+      }
+      body::-webkit-scrollbar {
+        width: 8px;
+      }
+      body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      body::-webkit-scrollbar-thumb {
+        background-color: rgba(155, 155, 155, 0.5);
+        border-radius: 20px;
+        border: transparent;
+      }
+      .custom-shadow {
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+      }
+      .neumorphic {
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.1),
+          -8px -8px 16px rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+      .dark .neumorphic {
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3),
+          -8px -8px 16px rgba(255, 255, 255, 0.02);
+      }
+      .neumorphic:hover {
+        transform: translateY(-3px);
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.12),
+          -10px -10px 20px rgba(255, 255, 255, 0.12);
+      }
+      .dark .neumorphic:hover {
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.4),
+          -10px -10px 20px rgba(255, 255, 255, 0.03);
+      }
+      .neumorphic-inset {
+        box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.1),
+          inset -6px -6px 12px rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+      }
+      .dark .neumorphic-inset {
+        box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.3),
+          inset -6px -6px 12px rgba(255, 255, 255, 0.02);
+      }
+      .neumorphic-button {
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1),
+          -4px -4px 8px rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        transition: all 0.2s ease;
+      }
+      .dark .neumorphic-button {
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3),
+          -4px -4px 8px rgba(255, 255, 255, 0.03);
+      }
+      .neumorphic-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.12),
+          -6px -6px 10px rgba(255, 255, 255, 0.12);
+      }
+      .dark .neumorphic-button:hover {
+        box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.4),
+          -6px -6px 10px rgba(255, 255, 255, 0.03);
+      }
+      .neumorphic-button:active {
+        transform: translateY(1px);
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.15),
+          inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+      }
+      .dark .neumorphic-button:active {
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4),
+          inset -2px -2px 5px rgba(255, 255, 255, 0.03);
+      }
+      .stage-card {
+        transition: all 0.3s ease;
+      }
+      .stage-card:hover {
+        transform: translateY(-4px);
+      }
+      .notification {
+        animation: slide-in 0.3s ease-out;
+      }
+      @keyframes slide-in {
+        0% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .artist-card {
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      .artist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      .dark .artist-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      }
+      .artist-card .overlay {
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        transition: all 0.3s ease;
+      }
+      .artist-card:hover .overlay {
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.9) 0%,
+          rgba(0, 0, 0, 0.1) 100%
+        );
+      }
+      .modal-enter {
+        animation: modal-fade-in 0.3s ease-out forwards;
+      }
+      @keyframes modal-fade-in {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .floating-nav {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+      }
+      .dark .floating-nav {
+        background-color: rgba(15, 23, 42, 0.8);
+      }
+      .btn-added {
+        box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15),
+          inset -3px -3px 6px rgba(255, 255, 255, 0.1);
+        transform: translateY(1px);
+      }
+      .dark .btn-added {
+        box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.4),
+          inset -3px -3px 6px rgba(255, 255, 255, 0.03);
+      }
+      .toast-notification {
+        animation: toast-slide-in 0.5s ease forwards;
+      }
+      @keyframes toast-slide-in {
+        from {
+          transform: translateY(100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .theme-switch {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: #f1f5f9;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+      }
+      .dark .theme-switch {
+        background-color: #334155;
+      }
+      .theme-switch-handle {
+        position: absolute;
+        top: 3px;
+        left: 4px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: white;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f59e0b;
+      }
+      .dark .theme-switch-handle {
+        left: 32px;
+        background-color: #0f172a;
+        color: #f1f5f9;
+      }
+      .favorite-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        transition: all 0.2s ease;
+      }
+      .favorite-indicator svg {
+        width: 20px;
+        height: 20px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2;
+        transition: all 0.2s ease;
+      }
+      .favorite-indicator.active svg {
+        fill: #ef4444;
+        stroke: #ef4444;
+      }
+      .countdown-timer {
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-dark-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-300"
+  >
+    <!-- Navbar -->
+    <nav
+      class="floating-nav border-b border-gray-100 dark:border-dark-700 fixed w-full z-50 top-0 left-0 py-4 px-4 shadow-md backdrop-blur-md transition-all duration-300"
+    >
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-primary-600 dark:text-primary-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+            />
+          </svg>
+          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            FestivalApp
+          </h1>
+        </div>
+        <div class="hidden md:flex space-x-8">
+          <a
+            href="#program"
+            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition duration-150 ease-in-out relative overflow-hidden group"
+          >
+            Program
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 dark:bg-primary-400 group-hover:w-full transition-all duration-300"
+            ></span>
+          </a>
+          <a
+            href="#asamalar"
+            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition duration-150 ease-in-out relative overflow-hidden group"
+          >
+            Stages
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 dark:bg-primary-400 group-hover:w-full transition-all duration-300"
+            ></span>
+          </a>
+          <a
+            href="#ajandam"
+            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition duration-150 ease-in-out relative overflow-hidden group"
+          >
+            My Agenda
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 dark:bg-primary-400 group-hover:w-full transition-all duration-300"
+            ></span>
+          </a>
+          <a
+            href="#harita"
+            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition duration-150 ease-in-out relative overflow-hidden group"
+          >
+            Festival Map
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 dark:bg-primary-400 group-hover:w-full transition-all duration-300"
+            ></span>
+          </a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <!-- Theme Switch -->
+          <div
+            id="themeToggle"
+            class="theme-switch"
+            role="button"
+            tabindex="0"
+            aria-label="Toggle dark mode"
+          >
+            <div class="theme-switch-handle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="sun-icon h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="moon-icon h-4 w-4 hidden"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <button
+            id="notificationToggle"
+            class="p-2 rounded-full bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 transition focus:outline-none relative"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-600 dark:text-gray-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              />
+            </svg>
+            <span
+              id="notificationBadge"
+              class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-secondary-500 rounded-full"
+              >0</span
+            >
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      class="pt-32 pb-20 px-4 bg-gradient-to-r from-primary-600 to-secondary-700 text-white"
+    >
+      <div class="max-w-7xl mx-auto text-center">
+        <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
+          2025 Summer Music Festival
+        </h1>
+        <p class="text-xl md:text-2xl mb-10 opacity-90">
+          June 27-30, 2025 • Istanbul, Turkey
+        </p>
+        <div class="inline-flex rounded-md shadow">
+          <a
+            href="#program"
+            class="px-8 py-4 bg-white text-primary-600 hover:bg-gray-100 font-semibold rounded-lg transition duration-150 ease-in-out transform hover:-translate-y-1 neumorphic"
+          >
+            View Schedule
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Program Section -->
+    <section id="program" class="py-20 px-4 bg-white dark:bg-dark-800">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Festival Schedule
+          </h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            View the event schedule organized by day and stage. Plan your
+            festival experience to catch your favorite artists!
+          </p>
+        </div>
+
+        <!-- Program Summary Panel -->
+        <div
+          class="mb-10 bg-gray-50 dark:bg-dark-700 rounded-xl p-6 neumorphic"
+        >
+          <h3
+            class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"
+          >
+            Schedule Summary
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div
+              class="bg-white dark:bg-dark-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-dark-600"
+            >
+              <h4 class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                Total Events
+              </h4>
+              <p
+                class="text-3xl font-bold text-gray-800 dark:text-gray-100"
+                id="totalPerformances"
+              >
+                15
+              </p>
+            </div>
+            <div
+              class="bg-white dark:bg-dark-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-dark-600"
+            >
+              <h4 class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                Selected Events
+              </h4>
+              <p
+                class="text-3xl font-bold text-primary-600 dark:text-primary-400"
+                id="selectedPerformances"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="bg-white dark:bg-dark-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-dark-600"
+            >
+              <h4 class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                Festival Days
+              </h4>
+              <p
+                class="text-3xl font-bold text-secondary-600 dark:text-secondary-400"
+                id="festivalDays"
+              >
+                4
+              </p>
+            </div>
+          </div>
+          
+          <!-- Upcoming Event Notification -->
+          <div id="upcomingEventContainer" class="mt-6 hidden">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+
+    
+        <!-- Filter System -->
+        <div class="mb-10">
+          <div class="flex flex-wrap justify-center gap-2 mb-8">
+            <button
+              class="day-tab px-6 py-3 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 font-medium border-2 border-primary-200 dark:border-primary-700 hover:bg-primary-200 dark:hover:bg-primary-800 transition focus:outline-none active-tab"
+              data-day="day1"
+            >
+              June 27
+            </button>
+            <button
+              class="day-tab px-6 py-3 rounded-full bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 font-medium border-2 border-transparent hover:bg-gray-200 dark:hover:bg-dark-600 transition focus:outline-none"
+              data-day="day2"
+            >
+              June 28
+            </button>
+            <button
+              class="day-tab px-6 py-3 rounded-full bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 font-medium border-2 border-transparent hover:bg-gray-200 dark:hover:bg-dark-600 transition focus:outline-none"
+              data-day="day3"
+            >
+              June 29
+            </button>
+            <button
+              class="day-tab px-6 py-3 rounded-full bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 font-medium border-2 border-transparent hover:bg-gray-200 dark:hover:bg-dark-600 transition focus:outline-none"
+              data-day="day4"
+            >
+              June 30
+            </button>
+          </div>
+
+          <!-- Stage Filters -->
+          <div class="flex flex-wrap justify-center gap-2 mb-8">
+            <button
+              class="stage-filter px-5 py-2 rounded-full bg-secondary-600 text-white font-medium hover:bg-secondary-700 transition focus:outline-none border border-secondary-600 active"
+              data-stage="all"
+            >
+              All Stages
+            </button>
+            <button
+              class="stage-filter px-5 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium hover:bg-blue-200 dark:hover:bg-blue-800/50 transition focus:outline-none border border-blue-200 dark:border-blue-700 flex items-center space-x-1"
+              data-stage="Main Stage"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+              <span>Main Stage</span>
+            </button>
+            <button
+              class="stage-filter px-5 py-2 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 font-medium hover:bg-pink-200 dark:hover:bg-pink-800/50 transition focus:outline-none border border-pink-200 dark:border-pink-700 flex items-center space-x-1"
+              data-stage="Electronic Stage"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              <span>Electronic Stage</span>
+            </button>
+            <button
+              class="stage-filter px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition focus:outline-none border border-gray-200 dark:border-gray-600 flex items-center space-x-1"
+              data-stage="Alternative Stage"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+              <span>Alternative Stage</span>
+            </button>
+          </div>
+          
+          <!-- Stage Labels Legend -->
+          <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <div class="inline-flex items-center bg-white dark:bg-dark-800 rounded-lg px-4 py-2 shadow">
+              <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+              <span class="text-sm text-gray-700 dark:text-gray-300">Main Stage</span>
+            </div>
+            <div class="inline-flex items-center bg-white dark:bg-dark-800 rounded-lg px-4 py-2 shadow">
+              <div class="w-3 h-3 bg-pink-500 rounded-full mr-2"></div>
+              <span class="text-sm text-gray-700 dark:text-gray-300">Electronic Stage</span>
+            </div>
+            <div class="inline-flex items-center bg-white dark:bg-dark-800 rounded-lg px-4 py-2 shadow">
+              <div class="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+              <span class="text-sm text-gray-700 dark:text-gray-300">Alternative Stage</span>
+            </div>
+          </div>
+
+        <!-- Day 1 Schedule -->
+        <div id="day1" class="day-content block">
+          <!-- Main Stage -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold mb-6 stage-title flex items-center"
+              data-stage="Main Stage"
+            >
+              <div class="w-4 h-4 bg-blue-500 rounded-full mr-3"></div>
+              <span class="text-blue-700 dark:text-blue-300">Main Stage</span>
+              <span class="text-sm text-gray-500 ml-2 font-normal">Main performances</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Duman -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white dark:bg-dark-800 shadow-lg h-80 relative performance-card"
+                data-id="1"
+                data-stage="Main Stage"
+                data-artist="Duman"
+                data-time="21:00 - 23:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+
+                <img
+                  src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Duman"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Duman</h4>
+                  <p class="text-gray-300 mb-4">21:00 - 23:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-primary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="1"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Model -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="2"
+                data-stage="Main Stage"
+                data-artist="Model"
+                data-time="18:30 - 20:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Model"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Model</h4>
+                  <p class="text-gray-300 mb-4">18:30 - 20:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-primary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="2"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Athena -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="3"
+                data-stage="Main Stage"
+                data-artist="Athena"
+                data-time="16:00 - 17:30"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="3"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Athena"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Athena</h4>
+                  <p class="text-gray-300 mb-4">16:00 - 17:30</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-primary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="3"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Electronic Stage -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold mb-6 stage-title flex items-center"
+              data-stage="Electronic Stage"
+            >
+              <div class="w-4 h-4 bg-pink-500 rounded-full mr-3"></div>
+              <span class="text-pink-700 dark:text-pink-300">Electronic Stage</span>
+              <span class="text-sm text-gray-500 ml-2 font-normal">Electronic music & DJ sets</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Mercan Dede -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="4"
+                data-stage="Electronic Stage"
+                data-artist="Mercan Dede"
+                data-time="22:00 - 00:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="4"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Mercan Dede"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Mercan Dede</h4>
+                  <p class="text-gray-300 mb-4">22:00 - 00:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-secondary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="4"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Can Temiz -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="5"
+                data-stage="Electronic Stage"
+                data-artist="Can Temiz"
+                data-time="19:30 - 21:30"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="5"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Can Temiz"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Can Temiz</h4>
+                  <p class="text-gray-300 mb-4">19:30 - 21:30</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-secondary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="5"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Oceanvs Orientalis -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="6"
+                data-stage="Electronic Stage"
+                data-artist="Oceanvs Orientalis"
+                data-time="17:00 - 19:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="6"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Oceanvs Orientalis"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">
+                    Oceanvs Orientalis
+                  </h4>
+                  <p class="text-gray-300 mb-4">17:00 - 19:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-secondary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="6"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alternative Stage -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold mb-6 stage-title flex items-center"
+              data-stage="Alternative Stage"
+            >
+              <div class="w-4 h-4 bg-gray-500 rounded-full mr-3"></div>
+              <span class="text-gray-700 dark:text-gray-300">Alternative Stage</span>
+              <span class="text-sm text-gray-500 ml-2 font-normal">Indie and alternative music</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Adamlar -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="7"
+                data-stage="Alternative Stage"
+                data-artist="Adamlar"
+                data-time="20:30 - 22:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="7"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Adamlar"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Adamlar</h4>
+                  <p class="text-gray-300 mb-4">20:30 - 22:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-gray-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="7"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Son Feci Bisiklet -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="8"
+                data-stage="Alternative Stage"
+                data-artist="Son Feci Bisiklet"
+                data-time="18:00 - 19:30"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="8"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1525979369137-a6a2692d25d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Son Feci Bisiklet"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">
+                    Son Feci Bisiklet
+                  </h4>
+                  <p class="text-gray-300 mb-4">18:00 - 19:30</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-gray-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="8"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Büyük Ev Ablukada -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="9"
+                data-stage="Alternative Stage"
+                data-artist="Büyük Ev Ablukada"
+                data-time="15:30 - 17:00"
+                data-day="June 27"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="9"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1529518969858-8baa65152fc8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Büyük Ev Ablukada"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">
+                    Büyük Ev Ablukada
+                  </h4>
+                  <p class="text-gray-300 mb-4">15:30 - 17:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-gray-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="9"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 2, 3, 4 Schedules (Hidden by default) -->
+        <div id="day2" class="day-content hidden">
+          <!-- Ana Sahne -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold text-gray-800 mb-6 stage-title"
+              data-stage="Main Stage"
+            >
+              Main Stage
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- MFÖ -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="10"
+                data-stage="Main Stage"
+                data-artist="MFÖ"
+                data-time="21:00 - 23:00"
+                data-day="June 28"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="10"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="MFÖ"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">MFÖ</h4>
+                  <p class="text-gray-300 mb-4">21:00 - 23:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-primary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="10"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mor ve Ötesi -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="11"
+                data-stage="Main Stage"
+                data-artist="Mor ve Ötesi"
+                data-time="18:30 - 20:00"
+                data-day="June 28"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="11"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Mor ve Ötesi"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Mor ve Ötesi</h4>
+                  <p class="text-gray-300 mb-4">18:30 - 20:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-primary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="11"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Elektronik Sahne -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold text-gray-800 mb-6 stage-title"
+              data-stage="Electronic Stage"
+            >
+              Electronic Stage
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Mert Demir -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="12"
+                data-stage="Electronic Stage"
+                data-artist="Mert Demir"
+                data-time="22:00 - 00:00"
+                data-day="June 28"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="12"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Mert Demir"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">Mert Demir</h4>
+                  <p class="text-gray-300 mb-4">22:00 - 00:00</p>
+                  <div class="flex justify-between items-center">
+                    <button
+                      class="text-white bg-secondary-600 bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-full text-sm font-medium transition focus:outline-none view-artist-bio"
+                      data-artist-id="12"
+                    >
+                      Artist Info
+                    </button>
+                    <button
+                      class="add-to-agenda p-2 rounded-full bg-white hover:bg-primary-50 text-primary-600 transition focus:outline-none"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alternatif Sahne -->
+          <div class="mb-12">
+            <h3
+              class="text-2xl font-bold text-gray-800 mb-6 stage-title"
+              data-stage="Alternative Stage"
+            >
+              Alternative Stage
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Yüzyüzeyken Konuşuruz -->
+              <div
+                class="artist-card rounded-xl overflow-hidden bg-white shadow-lg h-80 relative performance-card"
+                data-id="15"
+                data-stage="Alternative Stage"
+                data-artist="Yüzyüzeyken Konuşuruz"
+                data-time="19:30 - 21:00"
+                data-day="June 28"
+              >
+                <!-- Favorite Button -->
+                <button
+                  class="favorite-indicator absolute top-4 right-4 z-10"
+                  data-id="15"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </button>
+                
+                <img
+                  src="https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                  alt="Yüzyüzeyken Konuşuruz"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 overlay flex flex-col justify-end p-4"
+                >
+                  <h4 class="text-xl font-bold text-white">
+                    Yüzyüzeyken Konuşuruz
+                  </h4>
+            </div>
+            <div
+              class="divide-y divide-gray-200 dark:divide-dark-700"
+              id="programAgendaItems"
+            >
+              <!-- Agenda items will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Agenda Section -->
+    <section id="ajandam" class="py-20 px-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-800 dark:to-dark-900">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            My Festival Agenda
+          </h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Plan your festival experience by adding your favorite performances to your personal agenda.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <!-- My Agenda -->
+          <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-dark-800 rounded-xl shadow-lg overflow-hidden neumorphic mb-8">
+              <div class="p-6 border-b border-gray-100 dark:border-dark-700">
+                <div class="flex justify-between items-center">
+                  <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">My Schedule</h3>
+                  <button 
+                    id="clearAgendaBtn" 
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm font-medium flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Clear Agenda
+                  </button>
+                </div>
+              </div>
+              <div id="emptyAgenda" class="p-10 text-center">
+                <div class="mb-4 text-gray-400 dark:text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Your agenda is empty</h4>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Add performances by clicking the "+" button on any artist card</p>
+                <a href="#program" class="px-6 py-3 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition text-sm font-medium">
+                  Browse Schedule
+                </a>
+              </div>
+              <div id="myAgendaItems" class="hidden">
+                <div class="agenda-day-tabs flex space-x-1 p-4 bg-gray-50 dark:bg-dark-700 overflow-x-auto">
+                  <button class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-full">All Days</button>
+                  <button class="px-4 py-2 bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full hover:bg-gray-100 dark:hover:bg-dark-600">June 27</button>
+                  <button class="px-4 py-2 bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full hover:bg-gray-100 dark:hover:bg-dark-600">June 28</button>
+                  <button class="px-4 py-2 bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full hover:bg-gray-100 dark:hover:bg-dark-600">June 29</button>
+                  <button class="px-4 py-2 bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full hover:bg-gray-100 dark:hover:bg-dark-600">June 30</button>
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-dark-700" id="agendaItemsContainer">
+                  <!-- Agenda items will be populated here by JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Favorites and Upcoming Event -->
+          <div class="lg:col-span-1">
+            <!-- Favorites Section -->
+            <div class="bg-white dark:bg-dark-800 rounded-xl shadow-lg overflow-hidden neumorphic mb-8">
+              <div class="p-6 border-b border-gray-100 dark:border-dark-700">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">My Favorites</h3>
+              </div>
+              <div id="noFavoritesMessage" class="p-8 text-center">
+                <div class="mb-4 text-gray-400 dark:text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">No favorites yet</h4>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Click the heart icon on any artist card to add to favorites</p>
+              </div>
+              <div id="favoritesContainer" class="p-4 grid grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                <!-- Favorite items will be populated here by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Upcoming Event -->
+            <div class="bg-white dark:bg-dark-800 rounded-xl shadow-lg overflow-hidden neumorphic">
+              <div class="p-6 border-b border-gray-100 dark:border-dark-700">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Upcoming Event</h3>
+              </div>
+              <div id="upcomingEventContainer" class="p-4">
+                <!-- Will be populated dynamically by JavaScript -->
+                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                  <p>Add performances to your agenda to see your upcoming events</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Festival Map Section -->
+    <section id="harita" class="py-20 px-4 bg-white dark:bg-dark-800">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Festival Map
+          </h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Interactive map of the festival area. View the locations of stages,
+            food and beverage areas, and other important points.
+          </p>
+        </div>
+
+        <div class="bg-white dark:bg-dark-700 rounded-xl p-6 neumorphic">
+          <div
+            class="aspect-w-16 aspect-h-10 rounded-lg overflow-hidden relative"
+          >
+            <div
+              class="w-full h-[500px] bg-gray-100 dark:bg-dark-800 rounded-lg p-8 relative"
+            >
+              <!-- Festival Map -->
+              <div
+                class="w-full h-full bg-primary-50 dark:bg-dark-900 rounded-lg border-2 border-primary-100 dark:border-primary-800 relative p-8 overflow-hidden"
+              >
+                <!-- Map Background Elements - Paths, Roads -->
+                <div class="absolute inset-0 w-full h-full">
+                  <!-- Decorative Elements -->
+                  <div
+                    class="absolute top-1/4 left-1/2 w-1/3 h-1 bg-gray-300 dark:bg-gray-700 transform -translate-y-1/2 -translate-x-1/2 rotate-45"
+                  ></div>
+                  <div
+                    class="absolute top-1/2 left-1/4 w-1/2 h-1 bg-gray-300 dark:bg-gray-700 transform -translate-y-1/2"
+                  ></div>
+                  <div
+                    class="absolute top-1/2 left-1/2 w-1/4 h-1 bg-gray-300 dark:bg-gray-700 transform -translate-y-1/2 rotate-45"
+                  ></div>
+                  <div
+                    class="absolute bottom-1/4 left-1/2 w-1/3 h-1 bg-gray-300 dark:bg-gray-700 transform -translate-y-1/2 -translate-x-1/2 rotate-45"
+                  ></div>
+
+                  <!-- Background Zones Shapes -->
+                  <div
+                    class="absolute top-[15%] left-[15%] w-[25%] h-[20%] bg-blue-100 dark:bg-blue-900/30 rounded-xl opacity-30"
+                  ></div>
+                  <div
+                    class="absolute top-[45%] right-[15%] w-[25%] h-[20%] bg-pink-100 dark:bg-pink-900/30 rounded-xl opacity-30"
+                  ></div>
+                  <div
+                    class="absolute bottom-[20%] left-[40%] w-[25%] h-[20%] bg-gray-200 dark:bg-gray-800 rounded-xl opacity-30"
+                  ></div>
+                  <div
+                    class="absolute top-[30%] right-[30%] w-[15%] h-[15%] bg-yellow-100 dark:bg-yellow-900/30 rounded-xl opacity-30"
+                  ></div>
+                </div>
+
+                <!-- Main Stage -->
+                <div
+                  class="absolute top-[15%] left-[15%] transform -translate-x-1/2 -translate-y-1/2 z-10"
+                >
+                  <div
+                    class="map-location w-32 h-20 bg-blue-200 dark:bg-blue-900/50 border-2 border-blue-300 dark:border-blue-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-blue-300 dark:hover:bg-blue-800 transition shadow-md"
+                    data-location="Main Stage"
+                  >
+                    <div class="text-blue-700 dark:text-blue-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-blue-800 dark:text-blue-200 text-center"
+                      >Main Stage</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Electronic Stage -->
+                <div
+                  class="absolute top-[45%] right-[15%] transform translate-x-1/2 -translate-y-1/2 z-10"
+                >
+                  <div
+                    class="map-location w-32 h-20 bg-pink-200 dark:bg-pink-900/50 border-2 border-pink-300 dark:border-pink-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-pink-300 dark:hover:bg-pink-800 transition shadow-md"
+                    data-location="Electronic Stage"
+                  >
+                    <div class="text-pink-700 dark:text-pink-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-pink-800 dark:text-pink-200 text-center"
+                      >Electronic Stage</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Alternative Stage -->
+                <div
+                  class="absolute bottom-[20%] left-[40%] transform -translate-x-1/2 translate-y-1/2 z-10"
+                >
+                  <div
+                    class="map-location w-32 h-20 bg-gray-300 dark:bg-gray-700 border-2 border-gray-400 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-600 transition shadow-md"
+                    data-location="Alternative Stage"
+                  >
+                    <div class="text-gray-700 dark:text-gray-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-gray-800 dark:text-gray-200 text-center"
+                      >Alternative Stage</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Food & Drinks -->
+                <div
+                  class="absolute top-[30%] right-[30%] transform translate-x-1/2 -translate-y-1/2 z-10"
+                >
+                  <div
+                    class="map-location w-32 h-20 bg-yellow-200 dark:bg-yellow-900/50 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-yellow-300 dark:hover:bg-yellow-800 transition shadow-md"
+                    data-location="Food & Drinks"
+                  >
+                    <div class="text-yellow-700 dark:text-yellow-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-yellow-800 dark:text-yellow-200 text-center text-sm"
+                      >Food & Drinks</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Entrance -->
+                <div class="absolute bottom-[15%] right-[15%] z-10">
+                  <div
+                    class="map-location w-32 h-20 bg-green-200 dark:bg-green-900/50 border-2 border-green-300 dark:border-green-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-green-300 dark:hover:bg-green-800 transition shadow-md"
+                    data-location="Entrance"
+                  >
+                    <div class="text-green-700 dark:text-green-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-green-800 dark:text-green-200 text-center"
+                      >Entrance</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Restrooms -->
+                <div class="absolute top-[15%] right-[15%] z-10">
+                  <div
+                    class="map-location w-32 h-20 bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition shadow-md"
+                    data-location="Toilets"
+                  >
+                    <div class="text-blue-700 dark:text-blue-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-blue-800 dark:text-blue-200 text-center text-sm"
+                      >Restrooms</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Fire Exit -->
+                <div class="absolute left-[15%] bottom-[15%] z-10">
+                  <div
+                    class="map-location w-32 h-20 bg-red-100 dark:bg-red-900/30 border-2 border-red-200 dark:border-red-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-red-200 dark:hover:bg-red-800 transition shadow-md"
+                    data-location="Fire Exit"
+                  >
+                    <div class="text-red-700 dark:text-red-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-red-800 dark:text-red-200 text-center text-sm"
+                      >Fire Exit</span
+                    >
+                  </div>
+                </div>
+
+                <!-- First Aid -->
+                <div class="absolute top-[40%] left-[40%] z-10">
+                  <div
+                    class="map-location w-32 h-20 bg-rose-200 dark:bg-rose-900/50 border-2 border-rose-300 dark:border-rose-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-rose-300 dark:hover:bg-rose-800 transition shadow-md"
+                    data-location="First Aid"
+                  >
+                    <div class="text-rose-700 dark:text-rose-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-rose-800 dark:text-rose-200 text-center text-sm"
+                      >First Aid</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Stairs / Ramps -->
+                <div class="absolute right-[40%] bottom-[40%] z-10">
+                  <div
+                    class="map-location w-32 h-20 bg-indigo-200 dark:bg-indigo-900/50 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-indigo-300 dark:hover:bg-indigo-800 transition shadow-md"
+                    data-location="Stairs / Ramps"
+                  >
+                    <div class="text-indigo-700 dark:text-indigo-300 mb-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="font-medium text-indigo-800 dark:text-indigo-200 text-center text-sm"
+                      >Stairs / Ramps</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-blue-200 dark:bg-blue-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Main Stage</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-pink-200 dark:bg-pink-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Electronic Stage</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-gray-300 dark:bg-gray-700 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Alternative Stage</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-yellow-200 dark:bg-yellow-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Food & Drink Areas</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-green-200 dark:bg-green-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Entrance</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Restrooms</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-red-100 dark:bg-red-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >Fire Exit</span
+                >
+              </div>
+            </div>
+            <div
+              class="p-3 bg-gray-50 dark:bg-dark-700 rounded-lg neumorphic-inset"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-4 h-4 bg-rose-200 dark:bg-rose-900 rounded mr-2"
+                ></div>
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                  >First Aid</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Artist Bio Modal -->
+    <div
+      id="artistModal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-white dark:bg-dark-800 rounded-xl p-6 max-w-lg w-full mx-4 modal-enter"
+      >
+        <div class="flex justify-between items-start mb-4">
+          <h3
+            id="artistName"
+            class="text-2xl font-bold text-gray-900 dark:text-gray-100"
+          >
+            Artist Name
+          </h3>
+          <button
+            id="closeArtistModal"
+            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700 focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6 text-gray-600 dark:text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="w-full md:w-1/3">
+            <img
+              id="artistImage"
+              src=""
+              alt=""
+              class="w-full aspect-square object-cover rounded-lg shadow"
+            />
+          </div>
+          <div class="w-full md:w-2/3">
+            <p id="artistBio" class="text-gray-700 dark:text-gray-300 mb-4"></p>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <h4
+                  class="text-sm font-semibold text-gray-500 dark:text-gray-400"
+                >
+                  Genre
+                </h4>
+                <p
+                  id="artistGenre"
+                  class="text-gray-900 dark:text-gray-200"
+                ></p>
+              </div>
+              <div>
+                <h4
+                  class="text-sm font-semibold text-gray-500 dark:text-gray-400"
+                >
+                  Country
+                </h4>
+                <p
+                  id="artistCountry"
+                  class="text-gray-900 dark:text-gray-200"
+                ></p>
+              </div>
+              <div>
+                <h4
+                  class="text-sm font-semibold text-gray-500 dark:text-gray-400"
+                >
+                  Active Years
+                </h4>
+                <p
+                  id="artistYears"
+                  class="text-gray-900 dark:text-gray-200"
+                ></p>
+              </div>
+              <div>
+                <h4
+                  class="text-sm font-semibold text-gray-500 dark:text-gray-400"
+                >
+                  Stage
+                </h4>
+                <p
+                  id="artistStage"
+                  class="text-gray-900 dark:text-gray-200"
+                ></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <button
+            id="closeArtistBtn"
+            class="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transition focus:outline-none"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location Information Modal -->
+    <div
+      id="locationModal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-white dark:bg-dark-800 rounded-xl p-6 max-w-lg w-full mx-4 modal-enter"
+      >
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex items-center">
+            <div
+              id="locationIcon"
+              class="mr-3 text-gray-600 dark:text-gray-400"
+            >
+              <!-- Icon will be placed here by JavaScript -->
+            </div>
+            <h3
+              id="locationTitle"
+              class="text-2xl font-bold text-gray-900 dark:text-gray-100"
+            >
+              Location Information
+            </h3>
+          </div>
+          <button
+            id="closeLocationModal"
+            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700 focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6 text-gray-600 dark:text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="flex flex-col gap-6">
+          <p id="locationInfo" class="text-gray-700 dark:text-gray-300"></p>
+          <div class="mt-6">
+            <button
+              id="closeLocationBtn"
+              class="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transition focus:outline-none neumorphic-button"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div
+      id="notificationContainer"
+      class="fixed right-4 top-20 z-50 w-72 space-y-4"
+    ></div>
+
+    <!-- Toast Container for Upcoming Events -->
+    <div
+      id="toastContainer"
+      class="fixed bottom-4 right-4 z-50 w-72 space-y-4"
+    ></div>
+
+    <!-- Footer -->
+    <footer
+      class="bg-gradient-to-r from-primary-600 to-secondary-700 text-white py-16"
+    >
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between mb-12">
+          <div class="mb-8 md:mb-0">
+            <div class="flex items-center space-x-2 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                />
+              </svg>
+              <h2 class="text-2xl font-bold">FestivalApp</h2>
+            </div>
+            <p class="text-gray-200 max-w-sm">
+              Discover your favorite artists and enjoy a personalized festival
+              experience.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-8 md:grid-cols-3">
+            <div>
+              <h3 class="text-white font-semibold mb-4">Festival</h3>
+              <ul class="space-y-2 text-gray-200">
+                <li>Schedule</li>
+                <li>Artists</li>
+                <li>Map</li>
+                <li>FAQ</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold mb-4">Contact</h3>
+              <ul class="space-y-2 text-gray-200">
+                <li>Get in Touch</li>
+                <li>Press</li>
+                <li>Sponsorship</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold mb-4">Follow Us</h3>
+              <div class="flex space-x-4">
+                <a href="#" class="text-white hover:text-gray-300 transition">
+                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                    ></path>
+                  </svg>
+                </a>
+                <a href="#" class="text-white hover:text-gray-300 transition">
+                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                    ></path>
+                  </svg>
+                </a>
+                <a href="#" class="text-white hover:text-gray-300 transition">
+                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+                    ></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pt-8 border-t border-white/10 text-center">
+          <p class="text-gray-300 text-sm">
+            © 2025 FestivalApp. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Artist Data
+      const artistData = [
+        {
+          id: 1,
+          name: "Duman",
+          bio: "Duman is one of Turkey's most influential rock bands, known for their unique blend of rock music with Anatolian elements.",
+          image:
+            "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Rock",
+          country: "Turkey",
+          years: "1999 - present",
+          stage: "Main Stage",
+          time: "21:00 - 23:00",
+          day: "June 27",
+        },
+        {
+          id: 2,
+          name: "Model",
+          bio: "Model is a Turkish alternative rock band known for their energetic live performances and thoughtful lyrics.",
+          image:
+            "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Alternative Rock",
+          country: "Turkey",
+          years: "2005 - present",
+          stage: "Main Stage",
+          time: "18:30 - 20:00",
+          day: "June 27",
+        },
+        {
+          id: 3,
+          name: "Athena",
+          bio: "Athena is one of Turkey's most successful ska punk bands, representing Turkey at the Eurovision Song Contest 2004.",
+          image:
+            "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Ska Punk",
+          country: "Turkey",
+          years: "1987 - present",
+          stage: "Main Stage",
+          time: "16:00 - 17:30",
+          day: "June 27",
+        },
+        {
+          id: 4,
+          name: "Mercan Dede",
+          bio: "Mercan Dede is a Turkish DJ and musician who blends electronic music with traditional Sufi elements and mysticism.",
+          image:
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Electronic / Sufi",
+          country: "Turkey",
+          years: "1995 - present",
+          stage: "Electronic Stage",
+          time: "22:00 - 00:00",
+          day: "June 27",
+        },
+        {
+          id: 5,
+          name: "Can Temiz",
+          bio: "Can Temiz is a prominent figure in Turkey's electronic music scene, known for his techno and house sets.",
+          image:
+            "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Techno / House",
+          country: "Turkey",
+          years: "2010 - present",
+          stage: "Electronic Stage",
+          time: "19:30 - 21:30",
+          day: "June 27",
+        },
+        {
+          id: 6,
+          name: "Oceanvs Orientalis",
+          bio: "Oceanvs Orientalis is a Turkish electronic music artist who integrates Anatolian musical elements into his atmospheric sets.",
+          image:
+            "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Electronic / World",
+          country: "Turkey",
+          years: "2012 - present",
+          stage: "Electronic Stage",
+          time: "17:00 - 19:00",
+          day: "June 27",
+        },
+        {
+          id: 7,
+          name: "Adamlar",
+          bio: "Adamlar is a Turkish indie rock band known for their melancholic sound and poetic lyrics.",
+          image:
+            "https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Indie Rock",
+          country: "Turkey",
+          years: "2012 - present",
+          stage: "Alternative Stage",
+          time: "20:30 - 22:00",
+          day: "June 27",
+        },
+        {
+          id: 8,
+          name: "Son Feci Bisiklet",
+          bio: "Son Feci Bisiklet is a Turkish indie rock band with a distinctive sound that blends melancholy with energetic rhythms.",
+          image:
+            "https://images.unsplash.com/photo-1525979369137-a6a2692d25d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Indie Rock",
+          country: "Turkey",
+          years: "2011 - present",
+          stage: "Alternative Stage",
+          time: "18:00 - 19:30",
+          day: "June 27",
+        },
+        {
+          id: 9,
+          name: "Büyük Ev Ablukada",
+          bio: "Büyük Ev Ablukada is a Turkish experimental music collective known for their unconventional approach to music and lyrics.",
+          image:
+            "https://images.unsplash.com/photo-1529518969858-8baa65152fc8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Experimental / Alternative",
+          country: "Turkey",
+          years: "2008 - present",
+          stage: "Alternative Stage",
+          time: "15:30 - 17:00",
+          day: "June 27",
+        },
+        {
+          id: 10,
+          name: "MFÖ",
+          bio: "MFÖ is one of Turkey's most beloved rock groups, with a career spanning decades and numerous hit songs.",
+          image:
+            "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Pop Rock",
+          country: "Turkey",
+          years: "1971 - present",
+          stage: "Main Stage",
+          time: "21:00 - 23:00",
+          day: "June 28",
+        },
+        {
+          id: 11,
+          name: "Mor ve Ötesi",
+          bio: "Mor ve Ötesi is one of Turkey's most successful alternative rock bands, known for their thoughtful lyrics and distinctive sound.",
+          image:
+            "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Alternative Rock",
+          country: "Turkey",
+          years: "1995 - present",
+          stage: "Main Stage",
+          time: "18:30 - 20:00",
+          day: "June 28",
+        },
+        {
+          id: 12,
+          name: "Mert Demir",
+          bio: "Mert Demir is a rising star in Turkey's electronic music scene, known for his innovative production and energetic sets.",
+          image:
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Electronic / House",
+          country: "Turkey",
+          years: "2015 - present",
+          stage: "Electronic Stage",
+          time: "22:00 - 00:00",
+          day: "June 28",
+        },
+        {
+          id: 13,
+          name: "Teoman",
+          bio: "Teoman is one of Turkey's most prominent rock musicians, known for his poetic lyrics and distinctive voice.",
+          image:
+            "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Rock",
+          country: "Turkey",
+          years: "1992 - present",
+          stage: "Main Stage",
+          time: "21:00 - 23:00",
+          day: "June 29",
+        },
+        {
+          id: 14,
+          name: "Manga",
+          bio: "maNga is an award-winning Turkish rock band that blends alternative rock with electronic and traditional elements.",
+          image:
+            "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Alternative Rock / Nu Metal",
+          country: "Turkey",
+          years: "2001 - present",
+          stage: "Main Stage",
+          time: "21:00 - 23:00",
+          day: "June 30",
+        },
+        {
+          id: 15,
+          name: "Yüzyüzeyken Konuşuruz",
+          bio: "Formed in 2011, Yüzyüzeyken Konuşuruz has become an important name in Turkish alternative music scene with their unique lyrics and simple musical approach.",
+          image:
+            "https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+          genre: "Indie Rock / Alternative",
+          country: "Turkey",
+          years: "2011 - present",
+          stage: "Alternative Stage",
+          time: "19:30 - 21:00",
+          day: "June 28",
+        },
+      ];
+
+      // Location Data with icons
+      const locationData = {
+        "Main Stage": {
+          description:
+            "Headliner zone, biggest crowd, best sound system. Located at the center of the festival grounds, this is where the biggest artists perform. Equipped with high-quality sound systems and large screens.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>',
+          color: "blue",
+        },
+        "Electronic Stage": {
+          description:
+            "EDM/Techno zone, laser and light shows, late night DJs. This area is dedicated to DJs and electronic music artists. Known for impressive light shows, laser effects, and parties that go late into the night.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>',
+          color: "pink",
+        },
+        "Alternative Stage": {
+          description:
+            "Indie/Alternative scene, intimate vibe. Smaller and more intimate atmosphere hosting independent and experimental music artists. Enjoy concerts in a relaxed environment.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>',
+          color: "gray",
+        },
+        "Food & Drinks": {
+          description:
+            "Food trucks, drink stands, vegetarian & vegan options. Area with various food trucks and beverage stands offering options for every taste. Vegetarian and vegan options are also available.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
+          color: "yellow",
+        },
+        Entrance: {
+          description:
+            "Ticket check, lockers, welcome desk. Main entrance point to the festival grounds. Ticket control, security check, and information stands are located here. Lockers where you can leave your belongings are also available in this area.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>',
+          color: "green",
+        },
+        Toilets: {
+          description:
+            "Clean, includes disabled-access toilets. Area with clean and organized toilets. Disabled-accessible toilets are also available. There are multiple toilet locations throughout the festival grounds.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
+          color: "blue",
+        },
+        "Fire Exit": {
+          description:
+            "Emergency exit only, clearly marked signs and lights. Exit points designed for emergencies. Clearly marked signs and lights provide guidance. Should only be used in case of emergency.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>',
+          color: "red",
+        },
+        "First Aid": {
+          description:
+            "Medical staff, emergency assistance, accessible station. Area with medical personnel and emergency assistance teams. An easily accessible station for any health-related issues.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+          color: "rose",
+        },
+        "Stairs / Ramps": {
+          description:
+            "Stairs and ramps, ensures accessible paths. Stairs connecting different height sections of the festival area and ramps for disabled access. Designed for all visitors to move easily around the venue.",
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>',
+          color: "indigo",
+        },
+      };
+
+      // Global variables
+      let myAgenda = [];
+      let upcomingNotifications = [];
+      let currentDay = "day1";
+      let currentStage = "all";
+      let favoriteArtists = [];
+
+      // Load saved agenda from localStorage
+      function loadAgenda() {
+        try {
+          const savedAgenda = localStorage.getItem("festivalAgenda");
+          if (savedAgenda) {
+            myAgenda = JSON.parse(savedAgenda);
+          }
+        } catch (e) {
+          console.error("Error loading agenda from localStorage", e);
+          myAgenda = [];
+        }
+      }
+
+      // Load saved favorites from localStorage
+      function loadFavorites() {
+        try {
+          const savedFavorites = localStorage.getItem("festivalFavorites");
+          if (savedFavorites) {
+            favoriteArtists = JSON.parse(savedFavorites);
+          }
+        } catch (e) {
+          console.error("Error loading favorites from localStorage", e);
+          favoriteArtists = [];
+        }
+      }
+
+      // Initialize the application
+      function init() {
+        // Load saved data from localStorage
+        loadAgenda();
+        loadFavorites();
+
+        // Define DOM element references
+        const dayTabs = document.querySelectorAll(".day-tab");
+        const stageFilters = document.querySelectorAll(".stage-filter");
+        const performanceCards = document.querySelectorAll(".performance-card");
+        const artistBioButtons = document.querySelectorAll(".view-artist-bio");
+        const stageTitles = document.querySelectorAll(".stage-title");
+        const closeArtistModal = document.getElementById("closeArtistModal");
+        const closeArtistBtn = document.getElementById("closeArtistBtn");
+        const closeLocationModal = document.getElementById("closeLocationModal");
+        const closeLocationBtn = document.getElementById("closeLocationBtn");
+        const mapLocations = document.querySelectorAll(".map-location");
+        const clearAgendaBtn = document.getElementById("clearAgendaBtn");
+        const notificationToggle = document.getElementById("notificationToggle");
+        const emptyAgenda = document.getElementById("emptyAgenda");
+        const myAgendaItems = document.getElementById("myAgendaItems");
+
+        // Setup event listeners
+        dayTabs.forEach((tab) => {
+          tab.addEventListener("click", () => switchDay(tab.dataset.day));
+        });
+
+        stageFilters.forEach((filter) => {
+          filter.addEventListener("click", () =>
+            filterByStage(filter.dataset.stage)
+          );
+        });
+
+        // Setup favorite buttons
+        document.querySelectorAll(".favorite-indicator").forEach((button) => {
+          button.addEventListener("click", toggleFavorite);
+          
+          // Set initial state
+          const id = parseInt(button.dataset.id);
+          if (favoriteArtists.includes(id)) {
+            button.classList.add("active");
+          }
+        });
+
+        // Setup add to agenda buttons
+        performanceCards.forEach((card) => {
+          const id = card.dataset.id;
+          const addBtn = card.querySelector(".add-to-agenda");
+          
+          if (addBtn) {
+            addBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              addToAgenda(id);
+            });
+          }
+        });
+
+        // Setup artist bio buttons
+        artistBioButtons.forEach((button) => {
+          button.addEventListener("click", (e) => {
+            e.preventDefault();
+            showArtistModal(button.dataset.artistId);
+          });
+        });
+
+        // Setup modal close buttons
+        if (closeArtistModal) {
+          closeArtistModal.addEventListener("click", hideArtistModal);
+        }
+        if (closeArtistBtn) {
+          closeArtistBtn.addEventListener("click", hideArtistModal);
+        }
+        if (closeLocationModal) {
+          closeLocationModal.addEventListener("click", hideLocationModal);
+        }
+        if (closeLocationBtn) {
+          closeLocationBtn.addEventListener("click", hideLocationModal);
+        }
+
+        // Setup map location click events
+        mapLocations.forEach((location) => {
+          location.addEventListener("click", () => {
+            showLocationModal(location.dataset.location);
+          });
+        });
+
+        // Setup clear agenda button
+        if (clearAgendaBtn) {
+          clearAgendaBtn.addEventListener("click", clearAgenda);
+        }
+
+        // Setup notification toggle
+        if (notificationToggle) {
+          notificationToggle.addEventListener("click", toggleNotifications);
+        }
+
+        // Setup stage title click events
+        stageTitles.forEach((title) => {
+          title.addEventListener("click", () => {
+            filterByStage(title.dataset.stage);
+          });
+        });
+
+        // Update the UI with loaded data
+        updateAgendaUI();
+        updateFavoritesUI();
+        
+        // Show upcoming event
+        showUpcomingEvent();
+      }
+
+      // Switching days
+      function switchDay(day) {
+        currentDay = day;
+        currentStage = "all";
+
+        // Hide all day content
+        document.querySelectorAll(".day-content").forEach((content) => {
+          content.classList.add("hidden");
+        });
+
+        // Show selected day
+        const selectedDay = document.getElementById(day);
+        if (selectedDay) {
+          selectedDay.classList.remove("hidden");
+        } else {
+          console.error(`Day content with ID "${day}" not found`);
+        }
+
+        // Update tabs
+        dayTabs.forEach((tab) => {
+          if (tab.dataset.day === day) {
+            tab.classList.remove(
+              "bg-white",
+              "dark:bg-dark-800",
+              "text-gray-600",
+              "dark:text-gray-400"
+            );
+            tab.classList.add("bg-secondary-600", "text-white", "active");
+          } else {
+            tab.classList.remove("bg-secondary-600", "text-white", "active");
+            tab.classList.add(
+              "bg-white",
+              "dark:bg-dark-800",
+              "text-gray-600",
+              "dark:text-gray-400"
+            );
+          }
+        });
+
+        // Reset stage filters
+        resetStageFilters();
+        
+        // Make sure the schedule section is visible
+        const scheduleSection = document.querySelector(".schedule-section");
+        if (scheduleSection && scheduleSection.classList.contains("hidden")) {
+          scheduleSection.classList.remove("hidden");
+        }
+      }
+
+      // Reset stage filters
+      function resetStageFilters() {
+        const stageFilters = document.querySelectorAll(".stage-filter");
+        stageFilters.forEach((filter) => {
+          filter.classList.remove("active", "bg-secondary-600", "text-white");
+          filter.classList.add("bg-white", "text-gray-600");
+        });
+
+        const allFilter = document.querySelector(
+          '.stage-filter[data-stage="all"]'
+        );
+        if (allFilter) {
+          allFilter.classList.remove("bg-white", "text-gray-600");
+          allFilter.classList.add("active", "bg-secondary-600", "text-white");
+        }
+
+        // Show all performance cards for this day
+        const cards = document.querySelectorAll(".performance-card");
+        cards.forEach((card) => {
+          card.classList.remove("hidden");
+        });
+
+        // Make sure all stage sections for this day are visible
+        const selectedDay = document.querySelector(".day-content:not(.hidden)");
+        if (selectedDay) {
+          const stageTitles = selectedDay.querySelectorAll(".stage-title");
+          stageTitles.forEach((title) => {
+            const stageSection = title.closest("div.mb-12");
+            if (stageSection) {
+              stageSection.classList.remove("hidden");
+            }
+          });
+        }
+      }
+
+      // Filtering performances by stage
+      function filterByStage(stage) {
+        currentStage = stage;
+        
+        const stageFilters = document.querySelectorAll(".stage-filter");
+        stageFilters.forEach((filter) => {
+          filter.classList.remove("active", "bg-secondary-600", "text-white");
+          filter.classList.add("bg-white", "text-gray-600");
+        });
+
+        const activeFilter = document.querySelector(
+          `.stage-filter[data-stage="${stage}"]`
+        );
+        if (activeFilter) {
+          activeFilter.classList.remove("bg-white", "text-gray-600");
+          activeFilter.classList.add(
+            "active",
+            "bg-secondary-600",
+            "text-white"
+          );
+        }
+
+        // Get the current active day content
+        const activeDay = document.querySelector(".day-content:not(.hidden)");
+        if (!activeDay) {
+          console.error("No active day content found");
+          return;
+        }
+
+        // Make sure the schedule section is visible - use the program section as the main container
+        const scheduleSection = document.getElementById("program");
+        if (scheduleSection && scheduleSection.classList.contains("hidden")) {
+          scheduleSection.classList.remove("hidden");
+        }
+
+        if (stage === "all") {
+          // Show all cards in the active day
+          const cards = activeDay.querySelectorAll(".performance-card");
+          cards.forEach((card) => {
+            card.classList.remove("hidden");
+          });
+
+          // Show all stage sections
+          const stageSections = activeDay.querySelectorAll(
+            '.mb-12:has(.stage-title[data-stage])'
+          );
+          stageSections.forEach((section) => {
+            section.classList.remove("hidden");
+          });
+        } else {
+          // Show only cards that match the stage
+          const cards = activeDay.querySelectorAll(".performance-card");
+          cards.forEach((card) => {
+            if (card.dataset.stage === stage) {
+              card.classList.remove("hidden");
+            } else {
+              card.classList.add("hidden");
+            }
+          });
+
+          // Hide stage sections that don't match
+          const stageSections = activeDay.querySelectorAll(
+            '.mb-12:has(.stage-title[data-stage])'
+          );
+          stageSections.forEach((section) => {
+            const stageTitle = section.querySelector(".stage-title");
+            if (stageTitle && stageTitle.dataset.stage === stage) {
+              section.classList.remove("hidden");
+            } else {
+              section.classList.add("hidden");
+            }
+          });
+        }
+      }
+
+      // Add performance to personal agenda
+      function addToAgenda(id) {
+        const artist = artistData.find((a) => a.id === parseInt(id));
+
+        if (!artist) {
+          console.error(`Artist with ID ${id} not found`);
+          return;
+        }
+
+        // Check if already in agenda
+        if (myAgenda.some((item) => item.id === artist.id)) {
+          showNotification(
+            `${artist.name} is already in your agenda.`,
+            "warning"
+          );
+          return;
+        }
+
+        // Map day names to day IDs
+        const dayMapping = {
+          "June 27": "day1",
+          "June 28": "day2",
+          "June 29": "day3",
+          "June 30": "day4",
+          "27 June": "day1",
+          "28 June": "day2",
+          "29 June": "day3",
+          "30 June": "day4"
+        };
+
+        // Check if day is valid
+        if (!dayMapping[artist.day]) {
+          console.error(`Invalid day format: ${artist.day}`);
+          showNotification(
+            `Could not add ${artist.name} to your agenda. Invalid day format.`,
+            "error"
+          );
+          return;
+        }
+
+        myAgenda.push(artist);
+        localStorage.setItem("festivalAgenda", JSON.stringify(myAgenda));
+
+        // Her zaman göster
+        const myAgendaItems = document.getElementById("myAgendaItems");
+        const emptyAgenda = document.getElementById("emptyAgenda");
+        if (myAgendaItems && emptyAgenda) {
+          myAgendaItems.classList.remove("hidden");
+          emptyAgenda.classList.add("hidden");
+        }
+        
+        updateAgendaUI();
+        showNotification(`${artist.name} added to your agenda.`, "success");
+      }
+      // Update the agenda UI
+      function updateAgendaUI() {
+        // Hedef elemanı daha kesin şekilde seçiyoruz
+        const agendaItemsContainer = document.querySelector('#myAgendaItems #agendaItemsContainer');
+        
+        if (myAgenda.length === 0) {
+          // Her zaman myAgendaItems'ı göster, ama içine boş mesaj koy
+          emptyAgenda.classList.add("hidden");
+          myAgendaItems.classList.remove("hidden");
+          
+          agendaItemsContainer.innerHTML = `
+            <div class="py-6 text-center">
+              <p class="text-gray-500 dark:text-gray-400">Ajandanıza henüz konser eklenmedi.</p>
+              <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">Sanatçı kartlarındaki "+" düğmesine tıklayarak konser ekleyebilirsiniz.</p>
+            </div>
+          `;
+          return;
+        }
+
+        emptyAgenda.classList.add("hidden");
+        myAgendaItems.classList.remove("hidden");
+        
+        // Sort agenda items by day and time
+        myAgenda.sort((a, b) => {
+          if (a.day !== b.day) {
+            return a.day.localeCompare(b.day);
+          }
+          return a.time.localeCompare(b.time);
+        });
+
+        // Clear and rebuild agenda items list
+        agendaItemsContainer.innerHTML = "";
+
+        myAgenda.forEach((item) => {
+          const agendaItem = document.createElement("div");
+          agendaItem.className =
+            "py-4 hover:bg-gray-50 dark:hover:bg-dark-700 transition";
+          agendaItem.innerHTML = `
+                    <div class="flex items-center gap-4">
+                      <div class="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden">
+                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+                      </div>
+                      <div class="flex-grow min-w-0">
+                <h4 class="font-semibold text-gray-800 dark:text-gray-100">${item.name}</h4>
+                        <div class="flex flex-col sm:flex-row sm:items-center text-sm gap-1 sm:gap-4">
+                  <p class="text-gray-600 dark:text-gray-400">${item.day} | ${item.time}</p>
+                  <p class="text-primary-600 dark:text-primary-400">${item.stage}</p>
+                        </div>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">${item.genre}</p>
+                      </div>
+              <button class="remove-from-agenda p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition focus:outline-none" data-id="${item.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+          `;
+          agendaItemsContainer.appendChild(agendaItem);
+
+          // Add event listener to remove button
+          agendaItem
+            .querySelector(".remove-from-agenda")
+            .addEventListener("click", () => {
+              removeFromAgenda(item.id);
+            });
+        });
+
+        // Update program summary
+        updateProgramSummary();
+        
+        // Find upcoming event for notification
+        showUpcomingEvent();
+      }
+      
+      // Find and show upcoming event
+      function showUpcomingEvent() {
+        if (myAgenda.length === 0) return;
+        
+        // Sort agenda by date and time
+        const sortedAgenda = [...myAgenda].sort((a, b) => {
+          const dateA = new Date(a.day + " 2023 " + a.time.split(" - ")[0]);
+          const dateB = new Date(b.day + " 2023 " + b.time.split(" - ")[0]);
+          return dateA - dateB;
+        });
+        
+        // Find first upcoming event
+        const now = new Date();
+        const upcomingEvent = sortedAgenda.find(event => {
+          const eventDate = new Date(event.day + " 2023 " + event.time.split(" - ")[0]);
+          return eventDate > now;
+        }) || sortedAgenda[0]; // If no upcoming event, use the first one
+        
+        // Display notification for upcoming event
+        const upcomingContainer = document.getElementById("upcomingEventContainer");
+        upcomingContainer.innerHTML = `
+          <div class="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-3 px-4 rounded-lg shadow-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-lg">${upcomingEvent.name} is coming!</h4>
+                <p class="text-sm opacity-90">${upcomingEvent.day} at ${upcomingEvent.time} on ${upcomingEvent.stage}</p>
+                  </div>
+              <div class="bg-white/20 rounded-full px-3 py-1 text-sm font-medium">
+                Don't miss it!
+              </div>
+            </div>
+          </div>
+        `;
+        
+        if (upcomingContainer.classList.contains("hidden")) {
+          upcomingContainer.classList.remove("hidden");
+        }
+      }
+
+      // Remove an item from the agenda
+      function removeFromAgenda(id) {
+        const artist = artistData.find((a) => a.id === parseInt(id));
+        myAgenda = myAgenda.filter((item) => item.id !== parseInt(id));
+        localStorage.setItem("festivalAgenda", JSON.stringify(myAgenda));
+
+        updateAgendaUI();
+        showNotification(`${artist.name} removed from your agenda.`, "info");
+      }
+
+      // Clear the entire agenda
+      function clearAgenda() {
+        myAgenda = [];
+        localStorage.setItem("festivalAgenda", JSON.stringify(myAgenda));
+
+        updateAgendaUI();
+        showNotification("Your agenda has been cleared.", "info");
+      }
+
+      // Show artist modal with detailed information
+      function showArtistModal(artistId) {
+        const artist = artistData.find((a) => a.id === parseInt(artistId));
+
+        if (!artist) return;
+
+        document.getElementById("artistName").textContent = artist.name;
+        document.getElementById("artistImage").src = artist.image;
+        document.getElementById("artistImage").alt = artist.name;
+        document.getElementById("artistBio").textContent = artist.bio;
+        document.getElementById("artistGenre").textContent = artist.genre;
+        document.getElementById("artistCountry").textContent = artist.country;
+        document.getElementById("artistYears").textContent = artist.years;
+        document.getElementById("artistStage").textContent = artist.stage;
+
+        artistModal.classList.remove("hidden");
+      }
+
+      // Hide artist modal
+      function hideArtistModal() {
+        artistModal.classList.add("hidden");
+      }
+
+      // Show location information modal
+      function showLocationModal(location) {
+        const locationInfo = locationData[location];
+
+        if (!locationInfo) {
+          document.getElementById("locationTitle").textContent = location;
+          document.getElementById("locationInfo").textContent =
+            "Information not found.";
+          document.getElementById("locationIcon").innerHTML = "";
+        } else {
+          document.getElementById("locationTitle").textContent = location;
+          document.getElementById("locationInfo").textContent =
+            locationInfo.description;
+          document.getElementById("locationIcon").innerHTML = locationInfo.icon;
+
+          // Apply the specific color to the icon
+          const svgElement = document
+            .getElementById("locationIcon")
+            .querySelector("svg");
+          if (svgElement) {
+            svgElement.classList.add(`text-${locationInfo.color}-600`);
+          }
+        }
+
+        locationModal.classList.remove("hidden");
+      }
+
+      // Hide location modal
+      function hideLocationModal() {
+        locationModal.classList.add("hidden");
+      }
+
+      // Create a notification for upcoming performance
+      function createNotification(performance) {
+        const notification = document.createElement("div");
+        notification.className =
+          "notification bg-white p-4 rounded-lg shadow-lg border-l-4 border-primary-500 transform transition-transform";
+        notification.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-semibold text-gray-800">${performance.name}</h3>
+                        <p class="text-sm text-gray-600">Upcoming Performance: ${performance.time}</p>
+                        <p class="text-xs text-gray-500">${performance.stage}</p>
+                    </div>
+                    <button class="dismiss-notification p-1 text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+        notification
+          .querySelector(".dismiss-notification")
+          .addEventListener("click", () => {
+            notification.remove();
+            updateNotificationBadge();
+          });
+
+        notificationContainer.appendChild(notification);
+      }
+
+      // Update notification badge count
+      function updateNotificationBadge() {
+        const notificationCount = notificationContainer.children.length;
+
+        if (notificationCount > 0) {
+          notificationBadge.textContent = notificationCount;
+          notificationBadge.classList.remove("hidden");
+        } else {
+          notificationBadge.classList.add("hidden");
+        }
+      }
+
+      // Toggle notifications panel
+      function toggleNotifications() {
+        if (notificationContainer.classList.contains("hidden")) {
+          notificationContainer.classList.remove("hidden");
+        } else {
+          notificationContainer.classList.add("hidden");
+        }
+      }
+
+      // Show a notification message
+      function showNotification(message, type = "info") {
+        const colors = {
+          success: "bg-green-500",
+          info: "bg-blue-500",
+          warning: "bg-yellow-500",
+          error: "bg-red-500",
+        };
+
+        const notification = document.createElement("div");
+        notification.className = `notification p-4 rounded-lg shadow-lg text-white ${colors[type]}`;
+        notification.textContent = message;
+
+        notificationContainer.appendChild(notification);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Create a toast notification for upcoming performance
+      function createToastNotification(performance, minutesLeft) {
+        const toast = document.createElement("div");
+        toast.className =
+          "toast-notification bg-white p-4 rounded-lg shadow-lg border-l-4 border-secondary-500";
+        toast.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 pt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900">${performance.name} is coming up!</p>
+                <p class="mt-1 text-sm text-gray-500">
+                  Starting in ${minutesLeft} minutes at ${performance.stage}.
+                </p>
+              </div>
+            </div>
+            <button class="dismiss-toast ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        `;
+
+        document.getElementById("toastContainer").appendChild(toast);
+
+        toast.querySelector(".dismiss-toast").addEventListener("click", () => {
+          toast.remove();
+        });
+
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+          toast.classList.add("opacity-0");
+          setTimeout(() => toast.remove(), 300);
+        }, 10000);
+      }
+
+      // Update program summary
+      function updateProgramSummary() {
+        document.getElementById("totalPerformances").textContent =
+          artistData.length;
+        document.getElementById("selectedPerformances").textContent =
+          myAgenda.length;
+        document.getElementById("festivalDays").textContent = 4;
+      }
+
+      // Initialize the app
+      document.addEventListener("DOMContentLoaded", function () {
+        init();
+        updateProgramSummary();
+      });
+
+      // Theme Switching
+      document.addEventListener("DOMContentLoaded", function () {
+        const themeToggle = document.getElementById("themeToggle");
+        const sunIcon = document.querySelector(".sun-icon");
+        const moonIcon = document.querySelector(".moon-icon");
+
+        // Set initial theme based on localStorage
+        function applyTheme() {
+          const isDarkMode =
+            document.documentElement.classList.contains("dark");
+
+          // Show/hide appropriate icons
+          if (isDarkMode) {
+            sunIcon.classList.add("hidden");
+            moonIcon.classList.remove("hidden");
+          } else {
+            sunIcon.classList.remove("hidden");
+            moonIcon.classList.add("hidden");
+          }
+        }
+
+        // Apply theme on page load
+        applyTheme();
+
+        // Toggle theme when user clicks
+        themeToggle.addEventListener("click", function () {
+          if (document.documentElement.classList.contains("dark")) {
+            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.add("light");
+            localStorage.setItem("theme", "light");
+          } else {
+            document.documentElement.classList.remove("light");
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+          }
+
+          // Update icons
+          applyTheme();
+        });
+      });
+
+      // Toggle favorite status
+      function toggleFavorite(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const button = e.currentTarget;
+        const id = parseInt(button.dataset.id);
+
+        if (favoriteArtists.includes(id)) {
+          // Remove from favorites
+          favoriteArtists = favoriteArtists.filter(
+            (artistId) => artistId !== id
+          );
+          button.classList.remove("active");
+        } else {
+          // Add to favorites
+          favoriteArtists.push(id);
+          button.classList.add("active");
+
+          // Show notification
+          const artist = artistData.find((a) => a.id === id);
+          if (artist) {
+            showNotification(`${artist.name} added to favorites.`, "success");
+          }
+        }
+
+        // Save to localStorage
+        localStorage.setItem(
+          "festivalFavorites",
+          JSON.stringify(favoriteArtists)
+        );
+
+        // Update favorites UI
+        updateFavoritesUI();
+      }
+
+      // Update favorites UI in the summary section
+      function updateFavoritesUI() {
+        const container = document.getElementById("favoritesContainer");
+        const noFavoritesMessage =
+          document.getElementById("noFavoritesMessage");
+
+        // Clear previous content (except the no favorites message)
+        Array.from(container.children).forEach((child) => {
+          if (child !== noFavoritesMessage) {
+            container.removeChild(child);
+          }
+        });
+
+        // Update favorite indicators on all cards
+        document.querySelectorAll(".favorite-indicator").forEach((button) => {
+          const id = parseInt(button.dataset.id);
+          if (favoriteArtists.includes(id)) {
+            button.classList.add("active");
+          } else {
+            button.classList.remove("active");
+          }
+        });
+
+        // Show/hide no favorites message
+        if (favoriteArtists.length === 0) {
+          noFavoritesMessage.classList.remove("hidden");
+          return;
+        } else {
+          noFavoritesMessage.classList.add("hidden");
+        }
+
+        // Add favorite artist cards
+        favoriteArtists.forEach((id) => {
+          const artist = artistData.find((a) => a.id === id);
+          if (!artist) return;
+
+          const card = document.createElement("div");
+          card.className =
+            "bg-gray-50 dark:bg-dark-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-200";
+          card.innerHTML = `
+            <div class="relative h-32">
+              <img src="${artist.image}" alt="${artist.name}" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+              <div class="absolute bottom-2 left-3 text-white">
+                <h4 class="font-semibold">${artist.name}</h4>
+                <p class="text-xs">${artist.day} | ${artist.time}</p>
+              </div>
+            </div>
+            <div class="p-3 flex justify-between items-center">
+              <span class="text-xs font-medium text-primary-600 dark:text-primary-400">${artist.stage}</span>
+              <button class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 remove-favorite" data-id="${artist.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          `;
+
+          container.appendChild(card);
+
+          // Add event listener to remove button
+          card
+            .querySelector(".remove-favorite")
+            .addEventListener("click", () => {
+              favoriteArtists = favoriteArtists.filter(
+                (artistId) => artistId !== id
+              );
+              localStorage.setItem(
+                "festivalFavorites",
+                JSON.stringify(favoriteArtists)
+              );
+              updateFavoritesUI();
+              showNotification(
+                `${artist.name} removed from favorites.`,
+                "info"
+              );
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
