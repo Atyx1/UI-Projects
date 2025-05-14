@@ -71,15 +71,15 @@ Below is a showcase of my mini UI projects. Each one demonstrates different fron
 <img width="1694" alt="duygu" src="https://github.com/user-attachments/assets/4c30b934-03c4-4be2-8d5d-68b3357a981a" />
 
 
-<img width="1694" alt="card" src="https://github.com/user-attachments/assets/89435265-30b7-44be-9b24-36d3ecafdff5" />
-<img width="1694" alt="detail" src="https://github.com/user-attachments/assets/cf35cd06-cb6c-459a-8ed7-4457be9a54e6" />
+
 
 
 ---
 
 ## 11 – 🛍️ E-commerce Handmade Website v2
 <img width="1694" alt="homepage-1" src="https://github.com/user-attachments/assets/a27a88fd-feb1-4ffc-9316-aa36c2f1d80a" />
-
+<img width="1694" alt="card" src="https://github.com/user-attachments/assets/89435265-30b7-44be-9b24-36d3ecafdff5" />
+<img width="1694" alt="detail" src="https://github.com/user-attachments/assets/cf35cd06-cb6c-459a-8ed7-4457be9a54e6" />
 
 
 ---
